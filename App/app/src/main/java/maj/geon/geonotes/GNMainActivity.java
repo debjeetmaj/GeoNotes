@@ -1,8 +1,10 @@
 package maj.geon.geonotes;
 
 import android.content.Intent;
+import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -17,7 +19,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import maj.geon.geonotes.util.GNConstants;
 
@@ -37,6 +42,7 @@ public class GNMainActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    private TabLayout tabLayout;
     private String mEmail;
 
     @Override
@@ -46,6 +52,11 @@ public class GNMainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setTitle(R.string.title_activity_main);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+//        tabLayout = (TabLayout) findViewById(R.id.tabs);
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -54,9 +65,12 @@ public class GNMainActivity extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+
+//        tabLayout.setupWithViewPager(mViewPager);
+
         Intent intent = getIntent();
         mEmail=intent.getStringExtra(GNConstants.EMAIL);
-        toolbar.setTitle(mEmail);
+//        toolbar.setTitle(mEmail);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,7 +79,7 @@ public class GNMainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-
+        Toast.makeText(getApplicationContext(), "Hello "+mEmail, Toast.LENGTH_SHORT).show();
     }
 
 
@@ -119,10 +133,24 @@ public class GNMainActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
+            int section = getArguments().getInt(ARG_SECTION_NUMBER);
+
             View rootView = inflater.inflate(R.layout.fragment_gnmain, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-//            Menu menu =(Menu) rootView.findViewById(R.id.toolbar)
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+
+//            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
+            ListView list=(ListView) rootView.findViewById(R.id.listView);
+            // For the cursor adapter, specify which columns go into which views
+            String[] fromColumns = {ContactsContract.Data.DISPLAY_NAME};
+            int[] toViews = {R.id.txtTitle}; // The TextView in simple_list_item_1
+
+            // Create an empty adapter we will use to display the loaded data.
+            // We pass null for the cursor, then update it in onLoadFinished()
+            SimpleCursorAdapter mAdapter = new SimpleCursorAdapter(getActivity(),R.layout.notes_item, null,fromColumns, toViews, 0);
+            NotesCursor notesCursor = new NotesCursor(mAdapter,getActivity());
+            list.setAdapter(mAdapter);
+            getActivity().getLoaderManager().initLoader(0,null,notesCursor);
+//            getLoaderManager().initLoader(0, null, notesCursor);
+//            textView.setText(getString(R.string.section_format, section));
             return rootView;
         }
     }
@@ -154,11 +182,11 @@ public class GNMainActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "SECTION 1";
+                    return "Notes";
                 case 1:
-                    return "SECTION 2";
+                    return "Channels";
                 case 2:
-                    return "SECTION 3";
+                    return "My Notes";
             }
             return null;
         }

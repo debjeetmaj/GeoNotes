@@ -25,11 +25,11 @@
         <activity
             android:name=".GNMainActivity"
             android:label="@string/title_activity_gnmain"
-            android:theme="@style/AppTheme.NoActionBar" android:parentActivityName=".GNLoginActivity">
+            android:parentActivityName=".GNLoginActivity"
+            android:theme="@style/AppTheme.AppBarOverlay">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="maj.geon.geonotes.GNLoginActivity" />
-
         </activity>
     </application>
 
