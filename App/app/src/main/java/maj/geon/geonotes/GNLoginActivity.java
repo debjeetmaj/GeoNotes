@@ -53,7 +53,7 @@ public class GNLoginActivity extends AppCompatActivity implements LoaderCallback
      * TODO: remove after connecting to a real authentication system.
      */
     private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "debjeetm@iitk.ac.in:d", "amitn@iitk.ac.in:d"
+            "debjeetm@iitk.ac.in:d", "amitn@iitk.ac.in:d" , "a@b.com:d"
     };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
