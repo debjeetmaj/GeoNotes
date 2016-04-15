@@ -19,6 +19,20 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <!-- [End gcm permissions] -->
 
+    <!-- for gps functionality -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <uses-feature
+        android:name="android.hardware.location"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="false" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/notes_logo"
@@ -39,10 +53,17 @@
         </activity> <!-- -->
 
         <activity
+            android:name=".RegisterActivity"
+            android:label="@string/app_name">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="maj.geon.geonotes.FBLoginActivity" />
+        </activity> <!-- -->
+
+        <activity
             android:name=".GNMainActivity"
             android:label="@string/title_activity_gnmain"
-            android:parentActivityName=".GNLoginActivity"
-            android:theme="@style/AppTheme.AppBarOverlay">
+            android:parentActivityName=".GNLoginActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="maj.geon.geonotes.GNLoginActivity" />
@@ -108,10 +129,16 @@
             </intent-filter>
         </service>
 
+        <!-- GCM Ends -->
 
+        <!-- Location Tracking -->
+        <service
+            android:name=".util.GeoGPSTrackerService"
+            android:enabled="true"
+            android:exported="true" />
 
-
-
+        <service android:name=".util.MyJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
 </manifest>

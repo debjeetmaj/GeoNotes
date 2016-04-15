@@ -29,4 +29,7 @@ public class GNConstants {
     public static final String USERNAME = "username";
 //    public static final String EMAIL = "email";
     public static final String USERCLASS = "userclass";
+
+    // server url
+    public static final String server_URL = "http://192.168.0.2:9000";
 }

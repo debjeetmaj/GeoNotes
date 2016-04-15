@@ -27,17 +27,13 @@ public class SessionManager {
     public static final String KEY_FBID = "fbID";
     public static final String KEY_GCMID = "gcmID";
     public static final String KEY_USER_TYPE = "userType";
+    public static final String IS_REGISTERED = "ISREGISTERED";
 
-    // Constructor
     public SessionManager(Context context){
         this._context = context;
         pref = _context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
         editor = pref.edit();
     }
-
-    /**
-     * Create login session
-     * */
 
     public void createLoginSession(String name, String fbID, String gcmID, String userType){
         editor.putBoolean(IS_LOGIN, true);
@@ -69,46 +65,36 @@ public class SessionManager {
         editor.commit();
     }
 
+    public void setIsRegistered(Boolean registerStatus) {
+        editor.putBoolean(IS_REGISTERED, registerStatus);
+        editor.commit();
+    }
+
     // getters
     public String getKeyName() {
         return pref.getString(KEY_NAME, null);
     }
-
     public String getKeyFbid() {
         return pref.getString(KEY_FBID, null);
     }
-
     public String getKeyGcmid() {
         return pref.getString(KEY_GCMID, null);
     }
-
     public String getKeyUserType() {
         return pref.getString(KEY_USER_TYPE, null);
     }
 
-    /**
-     * Check login method wil check user login status
-     * If false it will redirect user to login page
-     * Else won't do anything
-     * */
+
     public void checkLogin(){
-        // Check login status
         if(!this.isLoggedIn()){
-            // user is not logged in redirect him to Login Activity
             Intent i = new Intent(_context, FBLoginActivity.class);
-            // Closing all the Activities
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            // Add new Flag to start new Activity
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            // Staring Login Activity
             _context.startActivity(i);
         }
 
     }
 
-    /**
-     * Get stored session data
-     * */
     public HashMap<String, String> getUserDetails(){
         HashMap<String, String> user = new HashMap<String, String>();
         user.put(KEY_NAME, pref.getString(KEY_NAME, null));
@@ -117,27 +103,19 @@ public class SessionManager {
         return user;
     }
 
-    /**
-     * Clear session details
-     * */
     public void logoutUser(){
-        // Clearing all data from Shared Preferences
         editor.clear();
         editor.commit();
-
-        // After logout redirect user to Loing Activity
         Intent i = new Intent(_context, FBLoginActivity.class);
-        // Closing all the Activities
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-        // Add new Flag to start new Activity
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        // Staring Login Activity
         _context.startActivity(i);
     }
 
     public boolean isLoggedIn(){
         return pref.getBoolean(IS_LOGIN, false);
+    }
+    public boolean isRegistered(){
+        return pref.getBoolean(IS_REGISTERED, false);
     }
 }

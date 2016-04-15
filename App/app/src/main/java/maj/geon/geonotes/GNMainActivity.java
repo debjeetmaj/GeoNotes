@@ -51,7 +51,7 @@ public class GNMainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_gnmain);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        setSupportActionBar(toolbar);
         toolbar.setTitle(R.string.title_activity_main);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

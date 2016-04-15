@@ -9,20 +9,18 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;
+import com.facebook.ProfileTracker;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-
-import maj.geon.geonotes.util.GNConstants;
 import maj.geon.geonotes.util.GeoRegistrationIntentService;
 import maj.geon.geonotes.util.SessionManager;
 
@@ -53,17 +51,20 @@ public class FBLoginActivity extends Activity {
 
 
         setContentView(R.layout.activity_login);
+
         loginButton = (LoginButton)findViewById(R.id.login_button);
 
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        Profile profile =  Profile.getCurrentProfile();
+        final Profile profile;
 
         if(accessToken != null) {
             Log.d("Check Login Status", "Already logged in");
             try {
                 session.setKeyFbid(accessToken.getUserId());
+                profile = Profile.getCurrentProfile();
                 if (profile != null) {
                     Log.i("sas", "user profile is " + profile.getName());
+                    session.setKeyName(profile.getName());
                 }
                 Log.i("sas", "user already logged in " + accessToken);
 
@@ -85,9 +86,26 @@ public class FBLoginActivity extends Activity {
             public void onSuccess(LoginResult loginResult) {
                 String textStr = "User ID: " + loginResult.getAccessToken().getUserId() + "\n" + "Auth Token: " + loginResult.getAccessToken().getToken();
                 Log.i("LoginActivity", textStr);
+                ProfileTracker mProfileTracker = null;
                 session.setKeyFbid(loginResult.getAccessToken().getUserId());
-                session.setKeyName(Profile.getCurrentProfile().getName());
-                switchActivity();
+                Profile profile_t = Profile.getCurrentProfile();
+                if (profile_t != null)
+                    session.setKeyName(profile_t.getName());
+                else{
+                    mProfileTracker = new ProfileTracker() {
+                        @Override
+                        protected void onCurrentProfileChanged(Profile profile, Profile profile2) {
+                            // profile2 is the new profile
+                            Log.v("facebook - profile", profile2.getFirstName());
+                            session.setKeyName(profile2.getName());
+                            this.stopTracking();
+                            switchActivity();
+                        }
+                    };
+
+                    mProfileTracker.startTracking();
+                }
+
             }
 
             @Override
@@ -117,11 +135,6 @@ public class FBLoginActivity extends Activity {
         AppEventsLogger.activateApp(this);
     }
 
-    /**
-     * Check the device to make sure it has the Google Play Services APK. If
-     * it doesn't, display a dialog that allows users to download the APK from
-     * the Google Play Store or enable it in the device's system settings.
-     */
     private boolean checkPlayServices() {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
@@ -141,9 +154,16 @@ public class FBLoginActivity extends Activity {
     // switch activity
     private void switchActivity() {
         try {
-            finish();
-            Intent intent = new Intent(getApplicationContext(), GNLoginActivity.class);
-            startActivity(intent);
+            if(session.isRegistered()) {
+                finish();
+                Intent intent = new Intent(getApplicationContext(), GNMainActivity.class);
+                startActivity(intent);
+            } else {
+                finish();
+                Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
+                startActivity(intent);
+            }
+
         } catch(Exception e) {
             Log.e("err switching activity ", e.toString());
         }
